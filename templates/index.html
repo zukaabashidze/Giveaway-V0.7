@@ -212,7 +212,7 @@
             const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
             
             // 1. Timezone შემოწმება
-            const allowedTimezones = ["Asia/Tbilisi"];
+            const allowedTimezones = ["Asia/Tbilisi", "Europe/Athens"];
             
             if (!allowedTimezones.includes(tz)) {
                 blockUser("თქვენი დროის სარტყელი არასწორია. გთხოვთ გამორთოთ VPN.");
