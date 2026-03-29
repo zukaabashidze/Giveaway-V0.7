@@ -15,7 +15,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 # პარამეტრები
-ADMIN_PASSWORD = "TSLadmin"
+ADMIN_PASSWORD = "ekaksitksudhsmnaeruhnuisdbnfibebi1235bndbndrdfdx@sdSds!Er45"
 PROXYCHECK_API_KEY = "m3j506-75k483-1c97ho-6848lz"
 
 class Participant(db.Model):
