@@ -223,7 +223,7 @@
                 // 2. IP შემოწმება
                 const response = await fetch('https://ipapi.co/json/');
                 const data = await response.json();
-                const allowedCountries = ["GE"];
+                const allowedCountries = ["GE", "GR"];
                 
                     if (!allowedCountries.includes(data.country)) {
                         blockUser(".");
