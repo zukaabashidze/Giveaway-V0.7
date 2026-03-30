@@ -299,6 +299,22 @@
             icon.classList.add('fa-eye');
         }
     }
+
+        function toggleIP(id, button) {
+    const ipSpan = document.getElementById(id);
+    const icon = button.querySelector('i');
+    
+    if (ipSpan.classList.contains('hidden-ip')) {
+        ipSpan.classList.remove('hidden-ip');
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+    } else {
+        ipSpan.classList.add('hidden-ip');
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+    }
+}
+        
     </script>
 </body>
 </html> 
