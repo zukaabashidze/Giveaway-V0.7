@@ -6,17 +6,17 @@
     <title>Admin Dashboard 🛠️</title>
     <style>
         :root {
-            --primary: #ff0000; /* ხასხასა ნეონის წითელი */
-            --accent: #8b0000;  /* მუქი წითელი აქცენტებისთვის */
-            --bg: #0a0000;      /* თითქმის შავი, წითელი ტონით */
-            --card-bg: rgba(20, 0, 0, 0.4); /* მუქი გამჭვირვალე წითელი */
+            --primary: #ff0000; 
+            --accent: #8b0000;  
+            --bg: #0a0000;      
+            --card-bg: rgba(20, 0, 0, 0.4);
             --danger: #ff4b2b;
             --success: #00ff88;
         }
         
         body {
             background: var(--bg);
-            /* რადიალური გრადიენტი უფრო ღრმა ეფექტისთვის */
+
             background: radial-gradient(circle at top left, #200000, #050000);
             color: white;
             font-family: 'Segoe UI', system-ui, sans-serif;
@@ -33,7 +33,6 @@
         
         h1 {
             font-size: 32px;
-            /* ტექსტის გრადიენტი წითელში */
             background: linear-gradient(to right, var(--primary), #ffb3b3);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -44,7 +43,6 @@
             filter: drop-shadow(0 0 10px rgba(255, 0, 0, 0.3));
         }
         
-        /* გამარჯვებულის ბლოკი - ცეცხლოვანი ეფექტი */
         .winner-box {
             background: linear-gradient(45deg, var(--accent), var(--primary));
             color: white;
@@ -64,7 +62,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
         
-        /* ღილაკები - Neon Red ეფექტით */
         .btn-pick {
             background: var(--primary);
             color: white;
@@ -86,8 +83,7 @@
             box-shadow: 0 6px 25px rgba(255, 0, 0, 0.6);
             filter: brightness(1.2);
         }
-        
-        /* ცხრილი */
+
         .table-container {
             background: var(--card-bg);
             backdrop-filter: blur(12px);
@@ -123,8 +119,7 @@
             background: rgba(255, 0, 0, 0.03);
             color: white;
         }
-        
-        /* IP ტეგი - წითელი განათებით */
+
         .ip-tag {
             background: rgba(255, 0, 0, 0.1);
             color: #ff6666;
@@ -166,7 +161,6 @@
             gap: 10px;
         }
         
-        /* დამალული IP */
         .hidden-ip {
             filter: blur(6px);
             user-select: none;
@@ -188,6 +182,19 @@
             background: var(--primary);
             color: black;
         }
+
+
+            .hidden-ip {
+                color: transparent !important;
+                text-shadow: 0 0 8px rgba(255, 0, 0, 0.8);
+                user-select: none;
+                transition: all 0.3s ease;
+            }
+            
+            .ip-tag:not(.hidden-ip) {
+                color: #ff6666 !important;
+                text-shadow: none;
+            }
     </style>
 </head>
 <body>
