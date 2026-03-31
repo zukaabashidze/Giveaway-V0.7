@@ -197,6 +197,11 @@
             <div class="stats">სულ მონაწილე: <b>{{ participants|length }}</b></div>
         </div>
 
+        <div class="search-container" style="margin-bottom: 20px;">
+            <input type="text" id="searchInput" onkeyup="searchTable()" placeholder="ძებნა (სახელი, Discord, Steam, IP)..." 
+               style="width: 100%; padding: 12px 20px; border-radius: 10px; border: 1px solid rgba(255,0,0,0.3); background: rgba(20,0,0,0.6); color: white; outline: none; font-size: 16px;">
+        </div>
+
 <div class="table-container">
     <table>
         <thead>
@@ -215,13 +220,11 @@
                     {{ p.full_name }}
                 </td>
 
-                <!-- Discord და Steam -->
                 <td>
                     <span style="color: #7289da;">{{ p.discord_tag }}</span><br>
                     <span style="font-size: 12px; opacity: 0.7;">{{ p.steam_name }}</span>
                 </td>
 
-                <!-- IP მისამართი -->
                 <td>
                     <div class="ip-container">
                         <span class="ip-tag hidden-ip" id="ip-{{ loop.index }}">{{ p.ip_address }}</span>
@@ -231,7 +234,6 @@
                     </div>
                 </td>
 
-                <!-- მოქმედება (წაშლის ღილაკი) -->
                 <td>
                     <a href="/delete/{{ p.id }}/{{ pw }}" 
                        class="btn-delete" 
@@ -246,6 +248,35 @@
 </div>
 
     <script>
+        function searchTable() {
+            const input = document.getElementById("searchInput");
+            const filter = input.value.toLowerCase();
+            const table = document.querySelector("table");
+            const tr = table.getElementsByTagName("tr");
+        
+            for (let i = 1; i < tr.length; i++) {
+                let found = false;
+                const tds = tr[i].getElementsByTagName("td");
+            
+                for (let j = 0; j < tds.length - 1; j++) {
+                    const td = tds[j];
+                    if (td) {
+                        const textValue = td.textContent || td.innerText;
+                        if (textValue.toLowerCase().indexOf(filter) > -1) {
+                            found = true;
+                            break;
+                        }
+                    }
+                }
+        
+                if (found) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+        
         async function pick() {
             const btn = document.querySelector('.btn-pick');
             btn.innerText = "მიმდინარეობს შერჩევა...";
@@ -259,8 +290,7 @@
                     w.style.display = 'block';
                     w.innerHTML = `🏆 გამარჯვებული: <span style="color: #fff; text-decoration: underline;">${data.full_name}</span> 
                                   <br><span style="font-size: 16px; opacity: 0.9;">Discord: ${data.discord} | Steam: ${data.steam}</span>`;
-                    
-                    // ეკრანზე ასქროლვა გამარჯვებულთან
+
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                 } else {
                     alert("მონაწილეები არ არიან!");
