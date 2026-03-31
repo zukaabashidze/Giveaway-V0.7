@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard 🛠️</title>
-    <!-- Font Awesome ხატულებისთვის -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
@@ -44,7 +43,6 @@
             filter: drop-shadow(0 0 10px rgba(255, 0, 0, 0.3));
         }
         
-        /* საძიებო ველის სტილები */
         .search-wrapper {
             margin-bottom: 25px;
             position: relative;
@@ -225,8 +223,7 @@
         <h1>ადმინ პანელი 🛠️</h1>
         
         <div id="win" class="winner-box"></div>
-        
-        <!-- ძებნის ველი -->
+
         <div class="search-wrapper">
             <i class="fas fa-search search-icon"></i>
             <input type="text" id="searchInput" onkeyup="searchTable()" placeholder="მოძებნე სახელით, Discord-ით, Steam-ით ან IP-თ...">
@@ -278,7 +275,6 @@
     </div>
 
     <script>
-        // ძებნის ფუნქცია
         function searchTable() {
             const input = document.getElementById("searchInput");
             const filter = input.value.toLowerCase();
@@ -308,8 +304,7 @@
                     tr[i].style.display = "none";
                 }
             }
-            // სურვილისამებრ შეგიძლია სტატისტიკაც განაახლო ძებნისას
-            // document.getElementById("participantCount").innerText = visibleCount;
+
         }
 
         async function pick() {
