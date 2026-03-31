@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard 🛠️</title>
+    <!-- Font Awesome ხატულებისთვის -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
             --primary: #ff0000; 
@@ -16,7 +18,6 @@
         
         body {
             background: var(--bg);
-
             background: radial-gradient(circle at top left, #200000, #050000);
             color: white;
             font-family: 'Segoe UI', system-ui, sans-serif;
@@ -41,6 +42,41 @@
             align-items: center;
             gap: 15px;
             filter: drop-shadow(0 0 10px rgba(255, 0, 0, 0.3));
+        }
+        
+        /* საძიებო ველის სტილები */
+        .search-wrapper {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        #searchInput {
+            width: 100%;
+            padding: 15px 20px;
+            padding-left: 45px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 0, 0, 0.2);
+            background: rgba(30, 0, 0, 0.5);
+            color: white;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        #searchInput:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.2);
+            background: rgba(40, 0, 0, 0.7);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary);
+            opacity: 0.7;
         }
         
         .winner-box {
@@ -182,82 +218,78 @@
             background: var(--primary);
             color: black;
         }
-
     </style>
 </head>
 <body>
-    <div class="rain" id="rainContainer"></div>
     <div class="container">
-        <h1 style="color: white;">ადმინ პანელი 🛠️</h1>
+        <h1>ადმინ პანელი 🛠️</h1>
         
         <div id="win" class="winner-box"></div>
         
+        <!-- ძებნის ველი -->
+        <div class="search-wrapper">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" id="searchInput" onkeyup="searchTable()" placeholder="მოძებნე სახელით, Discord-ით, Steam-ით ან IP-თ...">
+        </div>
+
         <div style="display: flex; justify-content: space-between; align-items: flex-end;">
             <button class="btn-pick" onclick="pick()">გამარჯვებულის გამოვლენა 🎲</button>
-            <div class="stats">სულ მონაწილე: <b>{{ participants|length }}</b></div>
+            <div class="stats">სულ მონაწილე: <b id="participantCount">{{ participants|length }}</b></div>
         </div>
 
-        <div class="search-container" style="margin-bottom: 20px;">
-            <input type="text" id="searchInput" onkeyup="searchTable()" placeholder="ძებნა (სახელი, Discord, Steam, IP)..." 
-               style="width: 100%; padding: 12px 20px; border-radius: 10px; border: 1px solid rgba(255,0,0,0.3); background: rgba(20,0,0,0.6); color: white; outline: none; font-size: 16px;">
+        <div class="table-container">
+            <table id="participantsTable">
+                <thead>
+                    <tr>
+                        <th>სახელი გვარი</th>
+                        <th>Discord / Steam</th>
+                        <th>IP მისამართი</th>
+                        <th>მოქმედება</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in participants %}
+                    <tr>
+                        <td style="color: white; font-weight: 500;">{{ p.full_name }}</td>
+                        <td>
+                            <span style="color: #7289da;">{{ p.discord_tag }}</span><br>
+                            <span style="font-size: 12px; opacity: 0.7;">{{ p.steam_name }}</span>
+                        </td>
+                        <td>
+                            <div class="ip-container">
+                                <span class="ip-tag hidden-ip" id="ip-{{ loop.index }}">{{ p.ip_address }}</span>
+                                <button type="button" class="toggle-ip" onclick="toggleIP('ip-{{ loop.index }}', this)">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </td>
+                        <td>
+                            <a href="/delete/{{ p.id }}/{{ pw }}" 
+                               class="btn-delete" 
+                               onclick="return confirm('ნამდვილად გსურთ წაშლა?')">
+                               წაშლა
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
-
-<div class="table-container">
-    <table>
-        <thead>
-            <tr>
-                <th>სახელი გვარი</th>
-                <th>Discord / Steam</th>
-                <th>მონაწილეთა სია</th>
-                <th>მოქმედება</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for p in participants %}
-            <tr>
-                <!-- სახელი და გვარი -->
-                <td style="color: white; font-weight: 500;">
-                    {{ p.full_name }}
-                </td>
-
-                <td>
-                    <span style="color: #7289da;">{{ p.discord_tag }}</span><br>
-                    <span style="font-size: 12px; opacity: 0.7;">{{ p.steam_name }}</span>
-                </td>
-
-                <td>
-                    <div class="ip-container">
-                        <span class="ip-tag hidden-ip" id="ip-{{ loop.index }}">{{ p.ip_address }}</span>
-                        <button type="button" class="toggle-ip" onclick="toggleIP('ip-{{ loop.index }}', this)">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                    </div>
-                </td>
-
-                <td>
-                    <a href="/delete/{{ p.id }}/{{ pw }}" 
-                       class="btn-delete" 
-                       onclick="return confirm('ნამდვილად გსურთ წაშლა?')">
-                       წაშლა
-                    </a>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
+    </div>
 
     <script>
+        // ძებნის ფუნქცია
         function searchTable() {
             const input = document.getElementById("searchInput");
             const filter = input.value.toLowerCase();
-            const table = document.querySelector("table");
+            const table = document.getElementById("participantsTable");
             const tr = table.getElementsByTagName("tr");
-        
+            let visibleCount = 0;
+
             for (let i = 1; i < tr.length; i++) {
                 let found = false;
                 const tds = tr[i].getElementsByTagName("td");
-            
+                
                 for (let j = 0; j < tds.length - 1; j++) {
                     const td = tds[j];
                     if (td) {
@@ -268,15 +300,18 @@
                         }
                     }
                 }
-        
+
                 if (found) {
                     tr[i].style.display = "";
+                    visibleCount++;
                 } else {
                     tr[i].style.display = "none";
                 }
             }
+            // სურვილისამებრ შეგიძლია სტატისტიკაც განაახლო ძებნისას
+            // document.getElementById("participantCount").innerText = visibleCount;
         }
-        
+
         async function pick() {
             const btn = document.querySelector('.btn-pick');
             btn.innerText = "მიმდინარეობს შერჩევა...";
@@ -290,7 +325,6 @@
                     w.style.display = 'block';
                     w.innerHTML = `🏆 გამარჯვებული: <span style="color: #fff; text-decoration: underline;">${data.full_name}</span> 
                                   <br><span style="font-size: 16px; opacity: 0.9;">Discord: ${data.discord} | Steam: ${data.steam}</span>`;
-
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                 } else {
                     alert("მონაწილეები არ არიან!");
@@ -302,22 +336,20 @@
             }
         }
 
-
         function toggleIP(id, button) {
-        const ipSpan = document.getElementById(id);
-        const icon = button.querySelector('i');
-        
-        if (ipSpan.classList.contains('hidden-ip')) {
-            ipSpan.classList.remove('hidden-ip');
-            icon.classList.remove('fa-eye');
-            icon.classList.add('fa-eye-slash');
-        } else {
-            ipSpan.classList.add('hidden-ip');
-            icon.classList.remove('fa-eye-slash');
-            icon.classList.add('fa-eye');
+            const ipSpan = document.getElementById(id);
+            const icon = button.querySelector('i');
+            
+            if (ipSpan.classList.contains('hidden-ip')) {
+                ipSpan.classList.remove('hidden-ip');
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                ipSpan.classList.add('hidden-ip');
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
         }
-    }
-        
     </script>
 </body>
-</html> 
+</html>
