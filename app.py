@@ -4,6 +4,7 @@ import os
 import requests
 from flask import Flask, render_template, request, jsonify, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import text
 
 app = Flask(__name__)
 
@@ -16,7 +17,6 @@ db = SQLAlchemy(app)
 ADMIN_PASSWORD = "ekaksitksudhsmnaeruhnuisdbnfibebi1235bndbndrdfdx@sdSds!Er45"
 PROXYCHECK_API_KEY = "m3j506-75k483-1c97ho-6848lz"
 
-# --- განახლებული მონაცემთა ბაზის მოდელი ---
 class Participant(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     full_name = db.Column(db.String(100), nullable=True) 
@@ -24,14 +24,20 @@ class Participant(db.Model):
     steam_name = db.Column(db.String(100), nullable=False)
     ip_address = db.Column(db.String(50), nullable=False)
     browser_fingerprint = db.Column(db.String(200), nullable=False)
-    device_info = db.Column(db.Text, nullable=True) # <-- დაემატა მოწყობილობისთვის
+    device_info = db.Column(db.Text, nullable=True) 
     date_joined = db.Column(db.DateTime, default=datetime.datetime.utcnow)
 
+# ბაზის იძულებითი განახლება Render-ისთვის
 with app.app_context():
     db.create_all()
+    # თუ სვეტი არ არსებობს, ვამატებთ ხელით (რომ ერორი არ ამოაგდოს)
+    try:
+        db.session.execute(text('ALTER TABLE participant ADD COLUMN device_info TEXT'))
+        db.session.commit()
+    except:
+        db.session.rollback()
 
 def is_vpn(ip):
-    """ამოწმებს IP-ს VPN/Proxy-ზე."""
     if ip == "127.0.0.1" or not ip:
         return False
     try:
@@ -63,26 +69,19 @@ def register():
         if not data:
             return jsonify({"status": "error", "message": "მონაცემები ცარიელია"}), 400
 
-        # IP-ს აღება
         user_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
         if user_ip and ',' in user_ip:
             user_ip = user_ip.split(',')[0].strip()
 
-        # VPN შემოწმება
         if is_vpn(user_ip):
-            return jsonify({
-                "status": "error", 
-                "message": "VPN-ის გამოყენება აკრძალულია!"
-            }), 400
+            return jsonify({"status": "error", "message": "VPN-ის გამოყენება აკრძალულია!"}), 400
 
-        # ბრაუზერის ინფორმაციის (User-Agent) აღება
         user_agent = request.headers.get('User-Agent', 'Unknown')
-
         fingerprint = data.get('fingerprint')
+        
         if not fingerprint:
             return jsonify({"status": "error", "message": "ბრაუზერის იდენტიფიკაცია ვერ მოხერხდა"}), 400
 
-        # დუბლიკატის შემოწმება
         exists = Participant.query.filter(
             (Participant.browser_fingerprint == fingerprint) | 
             (Participant.ip_address == user_ip)
@@ -91,14 +90,13 @@ def register():
         if exists:
             return jsonify({"status": "error", "message": "თქვენ უკვე დარეგისტრირებული ხართ!"}), 400
         
-        # ახალი მომხმარებლის შექმნა (აქ დაემატა device_info)
         new_user = Participant( 
             full_name=data.get('full_name', 'No Name'),
             discord_tag=data.get('discord_tag'), 
             steam_name=data.get('steam_name'), 
             ip_address=user_ip, 
             browser_fingerprint=fingerprint,
-            device_info=user_agent # <-- ინახავს მოწყობილობის ინფორმაციას
+            device_info=user_agent
         )
         
         db.session.add(new_user)
@@ -107,8 +105,8 @@ def register():
 
     except Exception as e:
         db.session.rollback()
-        print(f"Registration Error: {e}")
-        return jsonify({"status": "error", "message": "სერვერის შეცდომა"}), 500
+        print(f"Detailed Error: {e}")
+        return jsonify({"status": "error", "message": str(e)}), 500
 
 @app.route('/admin/<password>')
 def admin_panel(password):
@@ -120,7 +118,7 @@ def admin_panel(password):
 @app.route('/delete/<int:user_id>/<password>')
 def delete_user(user_id, password):
     if password != ADMIN_PASSWORD: return "Denied", 403
-    user = db.session.get(Participant, user_id)
+    user = Participant.query.get(user_id) # შეცვლილია თავსებადობისთვის
     if user:
         db.session.delete(user)
         db.session.commit()
