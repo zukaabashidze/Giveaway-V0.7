@@ -26,7 +26,7 @@
         }
         
         .container {
-            max-width: 1100px;
+            max-width: 1200px; /* ოდნავ გავზარდე სიგანე ახალი სვეტისთვის */
             margin: 0 auto;
             color: #ffffff;
         }
@@ -163,6 +163,17 @@
             font-size: 13px;
             border: 1px solid rgba(255, 0, 0, 0.2);
         }
+
+        .device-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: #bbb;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 4px 10px;
+            border-radius: 20px;
+        }
         
         .btn-delete {
             color: #ffb3b3;
@@ -240,7 +251,8 @@
                     <tr>
                         <th>სახელი გვარი</th>
                         <th>Discord / Steam</th>
-                        <th>მონაწილეთა ნომერი</th>
+                        <th>IP მისამართი</th>
+                        <th>მოწყობილობა</th>
                         <th>მოქმედება</th>
                     </tr>
                 </thead>
@@ -261,10 +273,16 @@
                             </div>
                         </td>
                         <td>
+                            <div class="device-tag">
+                                <i class="fas fa-question-circle device-icon" data-ua="{{ p.device_info }}"></i>
+                                <span class="device-name" data-ua="{{ p.device_info }}">იდენტიფიკაცია...</span>
+                            </div>
+                        </td>
+                        <td>
                             <a href="/delete/{{ p.id }}/{{ pw }}" 
                                class="btn-delete" 
                                onclick="return confirm('ნამდვილად გსურთ წაშლა?')">
-                               წაშლა
+                                წაშლა
                             </a>
                         </td>
                     </tr>
@@ -275,12 +293,42 @@
     </div>
 
     <script>
+        // მოწყობილობის ზუსტი ამოცნობის ფუნქცია
+        function parseDevice(ua) {
+            if (!ua || ua === "None") return { name: "უცნობია", icon: "fa-question-circle" };
+            
+            const lowerUA = ua.toLowerCase();
+            
+            if (lowerUA.includes("iphone")) return { name: "iPhone 📱", icon: "fa-mobile-alt" };
+            if (lowerUA.includes("ipad")) return { name: "iPad 📲", icon: "fa-tablet-alt" };
+            if (lowerUA.includes("android")) return { name: "Android 🤖", icon: "fa-android" };
+            if (lowerUA.includes("windows")) return { name: "Windows PC 💻", icon: "fa-windows" };
+            if (lowerUA.includes("macintosh") || lowerUA.includes("mac os")) return { name: "MacBook 💻", icon: "fa-apple" };
+            if (lowerUA.includes("linux")) return { name: "Linux PC 🐧", icon: "fa-linux" };
+            
+            return { name: "სხვა მოწყობილობა", icon: "fa-desktop" };
+        }
+
+        // გვერდის ჩატვირთვისას მოწყობილობების სახელების დაყენება
+        document.addEventListener("DOMContentLoaded", () => {
+            const deviceNames = document.querySelectorAll('.device-name');
+            const deviceIcons = document.querySelectorAll('.device-icon');
+            
+            deviceNames.forEach((el, index) => {
+                const ua = el.getAttribute('data-ua');
+                const info = parseDevice(ua);
+                el.innerText = info.name;
+                
+                const iconEl = deviceIcons[index];
+                iconEl.className = `fas ${info.icon} device-icon`;
+            });
+        });
+
         function searchTable() {
             const input = document.getElementById("searchInput");
             const filter = input.value.toLowerCase();
             const table = document.getElementById("participantsTable");
             const tr = table.getElementsByTagName("tr");
-            let visibleCount = 0;
 
             for (let i = 1; i < tr.length; i++) {
                 let found = false;
@@ -299,12 +347,10 @@
 
                 if (found) {
                     tr[i].style.display = "";
-                    visibleCount++;
                 } else {
                     tr[i].style.display = "none";
                 }
             }
-
         }
 
         async function pick() {
