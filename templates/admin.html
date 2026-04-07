@@ -12,11 +12,9 @@
             --bg: #0a0000;      
             --card-bg: rgba(20, 0, 0, 0.4);
             --danger: #ff4b2b;
-            --success: #00ff88;
         }
         
         body {
-            background: var(--bg);
             background: radial-gradient(circle at top left, #200000, #050000);
             color: white;
             font-family: 'Segoe UI', system-ui, sans-serif;
@@ -26,9 +24,8 @@
         }
         
         .container {
-            max-width: 1200px; /* ოდნავ გავზარდე სიგანე ახალი სვეტისთვის */
+            max-width: 1150px;
             margin: 0 auto;
-            color: #ffffff;
         }
         
         h1 {
@@ -40,7 +37,6 @@
             display: flex;
             align-items: center;
             gap: 15px;
-            filter: drop-shadow(0 0 10px rgba(255, 0, 0, 0.3));
         }
         
         .search-wrapper {
@@ -58,14 +54,7 @@
             color: white;
             font-size: 16px;
             outline: none;
-            transition: all 0.3s ease;
             box-sizing: border-box;
-        }
-
-        #searchInput:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 15px rgba(255, 0, 0, 0.2);
-            background: rgba(40, 0, 0, 0.7);
         }
 
         .search-icon {
@@ -88,12 +77,6 @@
             font-size: 20px;
             font-weight: bold;
             box-shadow: 0 10px 30px rgba(255, 0, 0, 0.4);
-            animation: slideIn 0.5s ease;
-        }
-        
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
         }
         
         .btn-pick {
@@ -104,129 +87,65 @@
             border-radius: 12px;
             font-weight: bold;
             cursor: pointer;
-            font-size: 16px;
             transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(255, 0, 0, 0.3);
             margin-bottom: 20px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
         }
         
-        .btn-pick:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 25px rgba(255, 0, 0, 0.6);
-            filter: brightness(1.2);
-        }
-
         .table-container {
             background: var(--card-bg);
             backdrop-filter: blur(12px);
             border-radius: 20px;
             border: 1px solid rgba(255, 0, 0, 0.15);
             overflow: hidden;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
         }
         
         table {
             width: 100%;
             border-collapse: collapse;
-            text-align: left;
         }
         
         th {
             background: rgba(255, 0, 0, 0.08);
             padding: 18px;
             color: var(--primary);
-            font-size: 14px;
             text-transform: uppercase;
-            letter-spacing: 1.5px;
+            font-size: 13px;
         }
         
         td {
             padding: 16px;
             border-bottom: 1px solid rgba(255, 0, 0, 0.05);
-            font-size: 15px;
             color: #ddd;
         }
-        
-        tr:hover td {
-            background: rgba(255, 0, 0, 0.03);
-            color: white;
+
+        .device-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.07);
+            padding: 5px 12px;
+            border-radius: 8px;
+            font-size: 14px;
         }
 
         .ip-tag {
             background: rgba(255, 0, 0, 0.1);
             color: #ff6666;
-            padding: 4px 10px;
+            padding: 4px 8px;
             border-radius: 6px;
-            font-family: 'Courier New', monospace;
-            font-size: 13px;
-            border: 1px solid rgba(255, 0, 0, 0.2);
+            font-family: monospace;
         }
 
-        .device-tag {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 13px;
-            color: #bbb;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 4px 10px;
-            border-radius: 20px;
-        }
-        
         .btn-delete {
             color: #ffb3b3;
             text-decoration: none;
-            font-weight: bold;
-            font-size: 12px;
-            padding: 6px 14px;
             border: 1px solid var(--danger);
-            border-radius: 8px;
-            transition: all 0.3s;
-            text-transform: uppercase;
-        }
-        
-        .btn-delete:hover {
-            background: var(--danger);
-            color: white;
-            box-shadow: 0 0 15px rgba(255, 75, 43, 0.4);
-        }
-        
-        .stats {
-            margin-bottom: 20px;
-            font-size: 14px;
-            color: #996666;
-            font-style: italic;
-        }
-        
-        .ip-container {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .hidden-ip {
-            filter: blur(6px);
-            user-select: none;
-            opacity: 0.5;
-        }
-        
-        .toggle-ip {
-            background: rgba(255, 0, 0, 0.1);
-            border: 1px solid rgba(255, 0, 0, 0.2);
-            color: var(--primary);
-            cursor: pointer;
-            border-radius: 5px;
-            padding: 3px 10px;
+            padding: 5px 10px;
+            border-radius: 6px;
             font-size: 12px;
-            transition: 0.3s;
         }
-        
-        .toggle-ip:hover {
-            background: var(--primary);
-            color: black;
-        }
+
+        .hidden-ip { filter: blur(6px); opacity: 0.5; }
     </style>
 </head>
 <body>
@@ -237,12 +156,12 @@
 
         <div class="search-wrapper">
             <i class="fas fa-search search-icon"></i>
-            <input type="text" id="searchInput" onkeyup="searchTable()" placeholder="მოძებნე სახელით, Discord-ით, Steam-ით ან მონაწილის ნომერით...">
+            <input type="text" id="searchInput" onkeyup="searchTable()" placeholder="მოძებნე მონაწილე...">
         </div>
 
-        <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
             <button class="btn-pick" onclick="pick()">გამარჯვებულის გამოვლენა 🎲</button>
-            <div class="stats">სულ მონაწილე: <b id="participantCount">{{ participants|length }}</b></div>
+            <div style="color: #966; font-style: italic;">სულ: {{ participants|length }}</div>
         </div>
 
         <div class="table-container">
@@ -259,31 +178,25 @@
                 <tbody>
                     {% for p in participants %}
                     <tr>
-                        <td style="color: white; font-weight: 500;">{{ p.full_name }}</td>
+                        <td style="color: white;">{{ p.full_name }}</td>
                         <td>
                             <span style="color: #7289da;">{{ p.discord_tag }}</span><br>
-                            <span style="font-size: 12px; opacity: 0.7;">{{ p.steam_name }}</span>
+                            <small style="opacity: 0.6;">{{ p.steam_name }}</small>
                         </td>
                         <td>
-                            <div class="ip-container">
-                                <span class="ip-tag hidden-ip" id="ip-{{ loop.index }}">{{ p.ip_address }}</span>
-                                <button type="button" class="toggle-ip" onclick="toggleIP('ip-{{ loop.index }}', this)">
-                                    <i class="fas fa-eye"></i>
-                                </button>
+                            <span class="ip-tag hidden-ip" id="ip-{{ loop.index }}">{{ p.ip_address }}</span>
+                            <button onclick="toggleIP('ip-{{ loop.index }}', this)" style="background:none; border:none; color:red; cursor:pointer;">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                        <td>
+                            <div class="device-badge">
+                                <i class="device-icon" data-ua="{{ p.device_info }}"></i>
+                                <span class="device-text" data-ua="{{ p.device_info }}">...</span>
                             </div>
                         </td>
                         <td>
-                            <div class="device-tag">
-                                <i class="fas fa-question-circle device-icon" data-ua="{{ p.device_info }}"></i>
-                                <span class="device-name" data-ua="{{ p.device_info }}">იდენტიფიკაცია...</span>
-                            </div>
-                        </td>
-                        <td>
-                            <a href="/delete/{{ p.id }}/{{ pw }}" 
-                               class="btn-delete" 
-                               onclick="return confirm('ნამდვილად გსურთ წაშლა?')">
-                                წაშლა
-                            </a>
+                            <a href="/delete/{{ p.id }}/{{ pw }}" class="btn-delete" onclick="return confirm('წავშალოთ?')">წაშლა</a>
                         </td>
                     </tr>
                     {% endfor %}
@@ -293,103 +206,58 @@
     </div>
 
     <script>
-        // მოწყობილობის ზუსტი ამოცნობის ფუნქცია
-        function parseDevice(ua) {
-            if (!ua || ua === "None") return { name: "უცნობია", icon: "fa-question-circle" };
+        // მხოლოდ ტელეფონი ან კომპიუტერი
+        function identifyDevice(ua) {
+            if (!ua) return { name: "უცნობია", icon: "fa-question" };
+            const lower = ua.toLowerCase();
             
-            const lowerUA = ua.toLowerCase();
+            // მობილურის ძირითადი მარკერები
+            const isMobile = /android|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(lower);
             
-            if (lowerUA.includes("iphone")) return { name: "iPhone 📱", icon: "fa-mobile-alt" };
-            if (lowerUA.includes("ipad")) return { name: "iPad 📲", icon: "fa-tablet-alt" };
-            if (lowerUA.includes("android")) return { name: "Android 🤖", icon: "fa-android" };
-            if (lowerUA.includes("windows")) return { name: "Windows PC 💻", icon: "fa-windows" };
-            if (lowerUA.includes("macintosh") || lowerUA.includes("mac os")) return { name: "MacBook 💻", icon: "fa-apple" };
-            if (lowerUA.includes("linux")) return { name: "Linux PC 🐧", icon: "fa-linux" };
-            
-            return { name: "სხვა მოწყობილობა", icon: "fa-desktop" };
+            if (isMobile) {
+                return { name: "ტელეფონი", icon: "fa-mobile-alt" };
+            } else {
+                return { name: "კომპიუტერი", icon: "fa-desktop" };
+            }
         }
 
-        // გვერდის ჩატვირთვისას მოწყობილობების სახელების დაყენება
         document.addEventListener("DOMContentLoaded", () => {
-            const deviceNames = document.querySelectorAll('.device-name');
-            const deviceIcons = document.querySelectorAll('.device-icon');
-            
-            deviceNames.forEach((el, index) => {
-                const ua = el.getAttribute('data-ua');
-                const info = parseDevice(ua);
+            document.querySelectorAll('.device-text').forEach((el, i) => {
+                const info = identifyDevice(el.getAttribute('data-ua'));
                 el.innerText = info.name;
-                
-                const iconEl = deviceIcons[index];
-                iconEl.className = `fas ${info.icon} device-icon`;
+                document.querySelectorAll('.device-icon')[i].className = "fas " + info.icon;
             });
         });
 
         function searchTable() {
-            const input = document.getElementById("searchInput");
-            const filter = input.value.toLowerCase();
-            const table = document.getElementById("participantsTable");
-            const tr = table.getElementsByTagName("tr");
-
-            for (let i = 1; i < tr.length; i++) {
-                let found = false;
-                const tds = tr[i].getElementsByTagName("td");
-                
-                for (let j = 0; j < tds.length - 1; j++) {
-                    const td = tds[j];
-                    if (td) {
-                        const textValue = td.textContent || td.innerText;
-                        if (textValue.toLowerCase().indexOf(filter) > -1) {
-                            found = true;
-                            break;
-                        }
-                    }
-                }
-
-                if (found) {
-                    tr[i].style.display = "";
-                } else {
-                    tr[i].style.display = "none";
-                }
-            }
+            const filter = document.getElementById("searchInput").value.toLowerCase();
+            const rows = document.querySelectorAll("#participantsTable tbody tr");
+            rows.forEach(row => {
+                row.style.display = row.innerText.toLowerCase().includes(filter) ? "" : "none";
+            });
         }
 
         async function pick() {
             const btn = document.querySelector('.btn-pick');
-            btn.innerText = "მიმდინარეობს შერჩევა...";
-            
+            btn.innerText = "ირჩევა...";
             try {
                 const res = await fetch('/pick_winner/{{ pw }}');
                 const data = await res.json();
-                
                 if(data.full_name) {
-                    const w = document.getElementById('win');
-                    w.style.display = 'block';
-                    w.innerHTML = `🏆 გამარჯვებული: <span style="color: #fff; text-decoration: underline;">${data.full_name}</span> 
-                                  <br><span style="font-size: 16px; opacity: 0.9;">Discord: ${data.discord} | Steam: ${data.steam}</span>`;
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                } else {
-                    alert("მონაწილეები არ არიან!");
+                    const winBox = document.getElementById('win');
+                    winBox.style.display = 'block';
+                    winBox.innerHTML = `🏆 გამარჯვებული: ${data.full_name}<br><small>Discord: ${data.discord}</small>`;
                 }
-            } catch (e) {
-                alert("შეცდომა გამარჯვებულის გამოვლენისას.");
-            } finally {
-                btn.innerText = "გამარჯვებულის გამოვლენა 🎲";
-            }
+            } catch (e) { alert("შეცდომა!"); }
+            btn.innerText = "გამარჯვებულის გამოვლენა 🎲";
         }
 
-        function toggleIP(id, button) {
-            const ipSpan = document.getElementById(id);
-            const icon = button.querySelector('i');
-            
-            if (ipSpan.classList.contains('hidden-ip')) {
-                ipSpan.classList.remove('hidden-ip');
-                icon.classList.remove('fa-eye');
-                icon.classList.add('fa-eye-slash');
-            } else {
-                ipSpan.classList.add('hidden-ip');
-                icon.classList.remove('fa-eye-slash');
-                icon.classList.add('fa-eye');
-            }
+        function toggleIP(id, btn) {
+            const el = document.getElementById(id);
+            const icon = btn.querySelector('i');
+            el.classList.toggle('hidden-ip');
+            icon.classList.toggle('fa-eye');
+            icon.classList.toggle('fa-eye-slash');
         }
     </script>
 </body>
