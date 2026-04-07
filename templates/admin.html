@@ -110,6 +110,7 @@
             color: var(--primary);
             text-transform: uppercase;
             font-size: 13px;
+            text-align: left;
         }
         
         td {
@@ -122,10 +123,11 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            background: rgba(255, 255, 255, 0.07);
-            padding: 5px 12px;
-            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 6px 14px;
+            border-radius: 10px;
             font-size: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         .ip-tag {
@@ -143,6 +145,12 @@
             padding: 5px 10px;
             border-radius: 6px;
             font-size: 12px;
+            transition: 0.3s;
+        }
+
+        .btn-delete:hover {
+            background: var(--danger);
+            color: white;
         }
 
         .hidden-ip { filter: blur(6px); opacity: 0.5; }
@@ -161,7 +169,7 @@
 
         <div style="display: flex; justify-content: space-between; align-items: center;">
             <button class="btn-pick" onclick="pick()">გამარჯვებულის გამოვლენა 🎲</button>
-            <div style="color: #966; font-style: italic;">სულ: {{ participants|length }}</div>
+            <div style="color: #966; font-style: italic;">სულ მონაწილე: {{ participants|length }}</div>
         </div>
 
         <div class="table-container">
@@ -178,25 +186,27 @@
                 <tbody>
                     {% for p in participants %}
                     <tr>
-                        <td style="color: white;">{{ p.full_name }}</td>
+                        <td style="color: white; font-weight: bold;">{{ p.full_name }}</td>
                         <td>
                             <span style="color: #7289da;">{{ p.discord_tag }}</span><br>
                             <small style="opacity: 0.6;">{{ p.steam_name }}</small>
                         </td>
                         <td>
-                            <span class="ip-tag hidden-ip" id="ip-{{ loop.index }}">{{ p.ip_address }}</span>
-                            <button onclick="toggleIP('ip-{{ loop.index }}', this)" style="background:none; border:none; color:red; cursor:pointer;">
-                                <i class="fas fa-eye"></i>
-                            </button>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span class="ip-tag hidden-ip" id="ip-{{ loop.index }}">{{ p.ip_address }}</span>
+                                <button onclick="toggleIP('ip-{{ loop.index }}', this)" style="background:none; border:none; color:var(--primary); cursor:pointer;">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
                         </td>
                         <td>
                             <div class="device-badge">
                                 <i class="device-icon" data-ua="{{ p.device_info }}"></i>
-                                <span class="device-text" data-ua="{{ p.device_info }}">...</span>
+                                <span class="device-text" data-ua="{{ p.device_info }}">იდენტიფიკაცია...</span>
                             </div>
                         </td>
                         <td>
-                            <a href="/delete/{{ p.id }}/{{ pw }}" class="btn-delete" onclick="return confirm('წავშალოთ?')">წაშლა</a>
+                            <a href="/delete/{{ p.id }}/{{ pw }}" class="btn-delete" onclick="return confirm('ნამდვილად გსურთ წაშლა?')">წაშლა</a>
                         </td>
                     </tr>
                     {% endfor %}
@@ -206,28 +216,44 @@
     </div>
 
     <script>
-        // მხოლოდ ტელეფონი ან კომპიუტერი
+        // გაუმჯობესებული დეტექცია: მხოლოდ კომპიუტერი ან ტელეფონი
         function identifyDevice(ua) {
-            if (!ua) return { name: "უცნობია", icon: "fa-question" };
-            const lower = ua.toLowerCase();
+            if (!ua || ua === "None" || ua === "") return { name: "უცნობია", icon: "fa-question-circle" };
             
-            // მობილურის ძირითადი მარკერები
-            const isMobile = /android|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(lower);
+            const lowerUA = ua.toLowerCase();
             
+            // კომპიუტერის მარკერები
+            const isDesktop = lowerUA.includes("windows") || 
+                              lowerUA.includes("macintosh") || 
+                              lowerUA.includes("linux") || 
+                              lowerUA.includes("x11");
+            
+            // ტელეფონის მარკერები
+            const isMobile = /android|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(lowerUA);
+
+            // პრიორიტეტი: თუ მობილურია -> ტელეფონი, თუ დესკტოპია -> კომპიუტერი
             if (isMobile) {
                 return { name: "ტელეფონი", icon: "fa-mobile-alt" };
-            } else {
+            } else if (isDesktop) {
                 return { name: "კომპიუტერი", icon: "fa-desktop" };
             }
+            
+            return { name: "კომპიუტერი", icon: "fa-desktop" }; // Default, თუ ვერ ამოიცნო (ჩვეულებრივ კომპიუტერია)
         }
 
-        document.addEventListener("DOMContentLoaded", () => {
-            document.querySelectorAll('.device-text').forEach((el, i) => {
-                const info = identifyDevice(el.getAttribute('data-ua'));
+        // გვერდის ჩატვირთვისას ყველა მოწყობილობის გადამოწმება
+        window.onload = function() {
+            const textElements = document.querySelectorAll('.device-text');
+            const iconElements = document.querySelectorAll('.device-icon');
+            
+            textElements.forEach((el, i) => {
+                const rawUA = el.getAttribute('data-ua');
+                const info = identifyDevice(rawUA);
+                
                 el.innerText = info.name;
-                document.querySelectorAll('.device-icon')[i].className = "fas " + info.icon;
+                iconElements[i].className = "fas " + info.icon + " device-icon";
             });
-        });
+        };
 
         function searchTable() {
             const filter = document.getElementById("searchInput").value.toLowerCase();
@@ -239,6 +265,7 @@
 
         async function pick() {
             const btn = document.querySelector('.btn-pick');
+            const originalText = btn.innerText;
             btn.innerText = "ირჩევა...";
             try {
                 const res = await fetch('/pick_winner/{{ pw }}');
@@ -247,9 +274,10 @@
                     const winBox = document.getElementById('win');
                     winBox.style.display = 'block';
                     winBox.innerHTML = `🏆 გამარჯვებული: ${data.full_name}<br><small>Discord: ${data.discord}</small>`;
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
                 }
-            } catch (e) { alert("შეცდომა!"); }
-            btn.innerText = "გამარჯვებულის გამოვლენა 🎲";
+            } catch (e) { alert("შეცდომა გამარჯვებულის გამოვლენისას!"); }
+            btn.innerText = originalText;
         }
 
         function toggleIP(id, btn) {
